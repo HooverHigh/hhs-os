@@ -31,8 +31,14 @@ case $(uname -m) in
 esac
 
 # Loop through file with URLs and Git clone each one
-while read url; do
-  basename=$(basename "$url")
-  echo "Cloning $basename..."
-  git clone "$url"
+while read line; do
+  url=$(echo "$line" | cut -d "|" -f 1)
+  branch=$(echo "$line" | cut -d "|" -f 2)
+  if [ -z "$branch" ]; then
+    echo "Cloning $url..."
+    git clone "$url"
+  else
+    echo "Cloning $url with branch $branch..."
+    git clone --branch "$branch" "$url"
+  fi
 done < repos
