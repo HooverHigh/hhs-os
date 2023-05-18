@@ -28,8 +28,8 @@ cd hhs-os
 
 ```bash
 #Build bullseye OS
-./create-os.sh -c builds/HHSOS-BULLSEYE
+./create-os.sh -c hhos/confs/HHSOS-BULLSEYE
 
 #Build buster OS
-./create-os.sh -c builds/HHSOS-BUSTER
+./create-os.sh -c hhos/confs/HHSOS-BUSTER
 ```
