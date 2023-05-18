@@ -30,6 +30,27 @@ case $(uname -m) in
     ;;
 esac
 
+# Function to traverse directories recursively
+traverse_directories() {
+    local current_dir="$1"
+
+    # Loop through all directories and files in the current directory
+    for item in "$current_dir"/*; do
+        if [ -d "$item" ]; then
+            # If the item is a directory, cd into it and check for the script
+            cd "$item"
+            if [ -f "install-deps.sh" ]; then
+                echo "Running install-deps.sh in $item..."
+                ./install-deps.sh
+            fi
+            # Recursively call the function to traverse the subdirectories
+            traverse_directories "$item"
+            # Go back to the previous directory
+            cd ..
+        fi
+    done
+}
+
 # Loop through file with URLs and Git clone each one
 while read line; do
   url=$(echo "$line" | cut -d "|" -f 1)
@@ -41,4 +62,15 @@ while read line; do
     echo "Cloning $url with branch $branch..."
     git clone --branch "$branch" "$url"
   fi
+
+  # Extract the repository name from the URL
+  repo_name=$(basename "$url" ".git")
+
+  # Traverse into the cloned repository and run install-deps.sh if found
+  echo "Installing $repo_name's dependencies:"
+  traverse_directories "$repo_name"
+  echo "Finished installing $repo_name's dependencies."
 done < repos
+
+echo "All subprojects downloaded and dependencies installed."
+echo "To build all projects and then build the os, run: \"build.sh all\", to just build the projects and not the os, run: \"build.sh projects\""
